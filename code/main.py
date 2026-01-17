@@ -5,7 +5,7 @@ from code.settings import SCREEN_TITLE
 def main():
     # Размер монитора
     screen_width, screen_height = arcade.get_display_size()
-
+    
     window = arcade.Window(
         width=screen_width,
         height=screen_height,
