@@ -5,7 +5,7 @@ from code.entities.rewindable_object import RewindableObject
 from code.entities.static_platform import StaticPlatform
 from code.entities.moving_platform import MovingPlatform
 
-from code.time_system import TimeSystem
+from code.time_system.time_system import TimeSystem
 from code.core.input_manager import InputManeger
 
 class GameView(arcade.View):
