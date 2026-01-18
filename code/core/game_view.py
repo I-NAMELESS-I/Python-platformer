@@ -28,7 +28,7 @@ class GameView(arcade.View):
         self.time_system = None 
 
         # Input
-        self.input_manager = None
+        self.input_manager = InputManeger(self.player, self.time_system, self.rewindable_objects)
 
     # ОТРИСОВКА
     def on_draw(self):
