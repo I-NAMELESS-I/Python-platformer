@@ -6,7 +6,7 @@ from code.entities.static_platform import StaticPlatform
 from code.entities.moving_platform import MovingPlatform
 
 from code.time_system.time_system import TimeSystem
-from code.core.input_manager import InputManeger
+from code.core.input_manager import InputManager
 
 class GameView(arcade.View):
     def __init__(self):
@@ -28,7 +28,7 @@ class GameView(arcade.View):
         self.time_system = None 
 
         # Input
-        self.input_manager = InputManeger(self.player, self.time_system, self.rewindable_objects)
+        self.input_manager = InputManager(self.player, self.time_system, self.rewindable_objects)
 
     # ОТРИСОВКА
     def on_draw(self):

@@ -1,5 +1,5 @@
 import arcade
-from settings import KEYBINDS
+from code.settings import KEYBINDS
 
 class InputManager:
     def __init__(self, player, time_system, rewindable_objects):
