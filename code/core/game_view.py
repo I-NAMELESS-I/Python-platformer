@@ -1,19 +1,19 @@
 import arcade
 
 from code.entities.player import Player
-from code.entities.rewindable_object import RewindableObject
-from code.entities.static_platform import StaticPlatform
-from code.entities.moving_platform import MovingPlatform
-
-from code.time_system.time_system import TimeSystem
+# from code.entities.rewindable_object import RewindableObject
+# from code.entities.static_platform import StaticPlatform
+# from code.entities.moving_platform import MovingPlatform
+#
+# from code.time_system.time_system import TimeSystem
 from code.core.input_manager import InputManager
 
-class GameView(arcade.View):
+class GameView(arcade.View, Player):
     def __init__(self):
         super().__init__()
 
         # Игрок
-        self.player = None
+        self.player = Player()
 
         # Список объектов, которые можно перематывать
         self.rewindable_objects = []
