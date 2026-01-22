@@ -13,22 +13,34 @@ class GameView(arcade.View, Player):
         super().__init__()
 
         # Игрок
-        self.player = Player()
+        self.player = Player(100, 100)
 
         # Список объектов, которые можно перематывать
-        self.rewindable_objects = []
+        self.rewindable_objects = [] # логика 
+        self.rewindable_objects_sprites = arcade.SpriteList() # спрайты
 
         # Статичные платформы 
-        self.static_platforms = []
+        self.static_platforms = arcade.SpriteList()
 
         # Двигающиеся платформы, которые нелзя перематывать
-        self.moving_platforms = []
+        self.moving_platforms = [] # логика 
+        self.moving_platform_sprites = arcade.SpriteList() # спрайты
 
         # Система времени
         self.time_system = None 
 
         # Input
         self.input_manager = InputManager(self.player, self.time_system, self.rewindable_objects)
+
+        # Шипы
+        self.death_zones = arcade.tilemap.process_layer(my_map, "DeathZones", use_spatial_hash=True)
+
+        # Физика 
+        self.physics_engine = arcade.PhysicsEnginePlatformer(
+            self.player,
+            platforms=self.static_platforms + self.moving_platform_sprites + self.rewindable_objects_sprites,
+            gravity_constant=1.0
+        )
 
     # ОТРИСОВКА
     def on_draw(self):
@@ -38,13 +50,11 @@ class GameView(arcade.View, Player):
         self.player.draw()
 
         # Рисуем объекты
-        for obj in self.rewindable_objects:
-            obj.draw()
-
-        for obj in self.moving_platforms:
-            obj.draw()
-
         for obj in self.static_platforms:
+            obj.draw()
+        for obj in self.moving_platform_sprites:
+            obj.draw()
+        for obj in self.rewindable_objects_sprites:
             obj.draw()
 
         # Рисуем UI 
@@ -52,21 +62,27 @@ class GameView(arcade.View, Player):
 
     # ОБНОВЛЕНИЕ ЛОГИКИ
     def on_update(self, delta_time):
+        self.input_manager.update(delta_time)
+        self.physics_engine.update()
+
         # Обновляем игрока
-        self.player.update(delta_time)
-
-        # Обновляем объекты
-        for obj in self.rewindable_objects:
-            obj.update(delta_time)
-
-        for obj in self.moving_platforms:
-            obj.update(delta_time)
-
-        for obj in self.static_platforms:
-            obj.update(delta_time)
+        self.player.update_on_ground_state(self.physics_engine)
+        self.player.update_animation(delta_time)
 
         # Обновляем систему времени
         self.time_system.update(delta_time, self.rewindable_objects)
+
+        # Проверка на шипы
+        if arcade.check_for_collision_with_list(self.player, self.death_zones):
+            self.player.kill()
+
+        # Логика движущихся платформ 
+        for platform in self.moving_platforms:
+            platform.update(delta_time) 
+        
+        # Логика выделяемых объектов 
+        for obj in self.rewindable_objects:
+            obj.update(delta_time)
 
     # INPUT
     def on_key_press(self, key, modifiers):
