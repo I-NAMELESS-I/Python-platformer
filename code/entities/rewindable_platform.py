@@ -57,20 +57,16 @@ class RewindablePlatform:
         if self.boundary_left is not None and self.sprite.center_x < self.boundary_left:
             self.sprite.center_x = self.boundary_left
             self.vx *= -1
-            self.original_vx *= -1
 
         if self.boundary_right is not None and self.sprite.center_x > self.boundary_right:
             self.sprite.center_x = self.boundary_right
             self.vx *= -1
-            self.original_vx *= -1
 
         # Проверка и обработка границ по Y
         if self.boundary_bottom is not None and self.sprite.center_y < self.boundary_bottom:
             self.sprite.center_y = self.boundary_bottom
             self.vy *= -1
-            self.original_vy *= -1
 
         if self.boundary_top is not None and self.sprite.center_y > self.boundary_top:
             self.sprite.center_y = self.boundary_top
             self.vy *= -1
-            self.original_vy *= -1
