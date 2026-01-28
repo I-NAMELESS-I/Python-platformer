@@ -22,22 +22,8 @@ class GameView(arcade.View):
         spawn_x, spawn_y = 0, 0
         spawn_layer = None
 
-        # Пытаемся найти слой спавна по разным вариантам имени
-        if hasattr(self.tile_map, "sprite_lists"):
-            for layer_name in ("spawn", "Spawn", "player_spawn", "PlayerSpawn"):
-                if layer_name in self.tile_map.sprite_lists:
-                    spawn_layer = self.tile_map.sprite_lists[layer_name]
-                    break
-
-        if spawn_layer and len(spawn_layer) > 0:
-            spawn_sprite = spawn_layer[0]
-            spawn_x, spawn_y = spawn_sprite.center_x, spawn_sprite.center_y
-        else:
-            # Если слой спавна не найден, используем запасную позицию
-            spawn_x, spawn_y = 300, 300
-
         # Игрок
-        self.player = Player(spawn_x, spawn_y)
+        self.player = LevelLoader.data.player
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player)
 

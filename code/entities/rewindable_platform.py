@@ -1,7 +1,6 @@
 import arcade
 from typing import Optional
 
-
 class RewindablePlatform:
     # Читаем свойства vx, vy из tmx в level_loader, потом саму платфому уже передаем в game_view
     def __init__(
@@ -16,17 +15,44 @@ class RewindablePlatform:
         self.vx = vx
         self.vy = vy
 
+        # Сохраняем "исходную" скорость, чтобы при rewind инвертировать её
         self.original_vx = vx
         self.original_vy = vy
 
-    def update(self, delta_time: float):
-        dx = self.vx * delta_time
-        dy = self.vy * delta_time
+        self.paused = False
+        self.rewinding = False
 
+    def start_pause(self):
+        if not self.paused:
+            self.paused = True
+    
+    def stop_pause(self):
+        if self.paused:
+            self.paused = False
+
+    def start_rewind(self):
+        if not self.rewinding:
+            self.rewinding = True
+    
+    def stop_rewind(self):
+        if self.rewinding:
+            self.rewinding = False
+
+    def update(self, delta_time: float):
+        if self.paused:
+            return
+
+        if self.rewinding:
+            dx = -self.vx * delta_time
+            dy = -self.vy * delta_time
+        else:
+            dx = self.vx * delta_time
+            dy = self.vy * delta_time
+
+        # Перемещаем спрайт вручную
         self.sprite.center_x += dx
         self.sprite.center_y += dy
 
-    
         # Проверка и обработка границ по X
         if self.boundary_left is not None and self.sprite.center_x < self.boundary_left:
             self.sprite.center_x = self.boundary_left
