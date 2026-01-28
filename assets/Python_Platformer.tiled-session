@@ -1,0 +1,41 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "maps/test_map.tmx",
+    "expandedProjectPaths": [
+        ".",
+        "maps"
+    ],
+    "fileStates": {
+        "maps/test_map.tmx": {
+            "scale": 1.655078125,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "tilesets/Dungeon Tile Set.tsx": {
+            "scaleInDock": 1
+        }
+    },
+    "last.imagePath": "C:/Users/kirak/PycharmProjects/Python-platformer/assets/tilesets",
+    "map.fixedSize": false,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "openFiles": [
+        "maps/test_map.tmx"
+    ],
+    "project": "Python_Platformer.tiled-project",
+    "recentFiles": [
+        "maps/test_map.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
+}

@@ -1,8 +1,9 @@
 import arcade
 from code.settings import KEYBINDS
 
+
 class InputManager:
-    def __init__(self, player, time_system, rewindable_objects):
+    def __init__(self, player, time_system=None, rewindable_objects=None):
         self.player = player
         self.time_system = time_system
         self.rewindable_objects = rewindable_objects
@@ -40,10 +41,10 @@ class InputManager:
         if self.check("fast_fall", key):
             self.keys["fast_fall"] = True
 
-        if self.check("time_stop", key):
+        if self.check("time_stop", key) and self.time_system is not None:
             self.time_system.toggle_time_stop()
 
-        if self.check("rewind", key):
+        if self.check("rewind", key) and self.time_system is not None:
             self.time_system.start_rewind()
 
     # KEY RELEASE
@@ -64,6 +65,10 @@ class InputManager:
     # MOUSE PRESS — выбор объекта
     def on_mouse_press(self, x, y, button, modifiers):
         if not self.check("select_object", button):
+            return
+
+        # Если система времени/объекты не настроены — просто выходим
+        if self.time_system is None or not self.rewindable_objects:
             return
 
         for obj in self.rewindable_objects:
