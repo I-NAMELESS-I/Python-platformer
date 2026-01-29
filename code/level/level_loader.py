@@ -5,6 +5,7 @@ import arcade
 
 from code.entities.player import Player
 from code.entities.rewindable_platform import RewindablePlatform
+from code.entities.moving_platform import MovingPlatform
 from code.settings import SPRITES_DIR
 
 
@@ -19,7 +20,7 @@ class LevelData:
         self.death_zones: arcade.SpriteList = arcade.SpriteList()
 
         # Объекты с логикой
-        self.moving_platforms: List[RewindablePlatform] = []
+        self.moving_platforms: List[MovingPlatform] = []
         self.rewindable_objects: List[RewindablePlatform] = []
 
 
@@ -28,7 +29,8 @@ class LevelLoader:
     Загружает уровень из TMX и возвращает LevelData.
     Ожидаемые имена слоёв в TMX:
       - Collision  (статичные платформы для physics)
-      - MovingPlatforms  (объекты-платформы с properties)
+      - MovingPlatform  (объекты-платформы с properties)
+      - RewindablePlatforms (объекты которые можно перемотать)
       - Spawn или PlayerSpawn  (точка спавна игрока)
       - DeathZones  (зоны смерти / шипы)
     Ожидаемые свойства объекта платформы:
@@ -78,8 +80,8 @@ class LevelLoader:
         data.player = Player(spawn_x, spawn_y)
 
         # 4. Moving platforms (пока только которые можно перемотать)
-        if hasattr(data.tile_map, "sprite_lists") and "MovingPlatforms" in data.tile_map.sprite_lists:
-            mp_list = data.tile_map.sprite_lists["MovingPlatforms"]
+        if hasattr(data.tile_map, "sprite_lists") and "RewindablePlatforms" in data.tile_map.sprite_lists:
+            mp_list = data.tile_map.sprite_lists["RewindablePlatforms"]
             for spr in mp_list:
                 props = getattr(spr, "properties", {}) or {}
 

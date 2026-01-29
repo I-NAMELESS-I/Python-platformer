@@ -2,7 +2,7 @@ import arcade
 from typing import Optional
 
 
-class RewindablePlatform:
+class MovingPlatform:
     # Читаем свойства vx, vy из tmx в level_loader, потом саму платфому уже передаем в game_view
     def __init__(
             self, sprite: arcade.Sprite, 
