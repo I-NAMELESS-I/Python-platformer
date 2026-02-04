@@ -22,6 +22,12 @@ class RewindablePlatform:
         self.paused = False
         self.rewinding = False
 
+        # Границы движения, если заданы в свойствах карты
+        self.boundary_left = boundary_left
+        self.boundary_right = boundary_right
+        self.boundary_top = boundary_top
+        self.boundary_bottom = boundary_bottom
+
     def start_pause(self):
         if not self.paused:
             self.paused = True

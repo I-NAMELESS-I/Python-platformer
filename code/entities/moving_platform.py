@@ -19,6 +19,12 @@ class MovingPlatform:
         self.original_vx = vx
         self.original_vy = vy
 
+        # Границы движения, если заданы в свойствах карты
+        self.boundary_left = boundary_left
+        self.boundary_right = boundary_right
+        self.boundary_top = boundary_top
+        self.boundary_bottom = boundary_bottom
+
     def update(self, delta_time: float):
         dx = self.vx * delta_time
         dy = self.vy * delta_time

@@ -6,7 +6,6 @@ import arcade
 from code.entities.player import Player
 from code.entities.rewindable_platform import RewindablePlatform
 from code.entities.moving_platform import MovingPlatform
-from code.settings import SPRITES_DIR
 
 
 class LevelData:
@@ -64,10 +63,10 @@ class LevelLoader:
         spawn_layer = None
 
         # Пытаемся найти слой спавна по разным вариантам имени
-        if hasattr(self.tile_map, "sprite_lists"):
+        if hasattr(data.tile_map, "sprite_lists"):
             for layer_name in ("spawn", "Spawn", "player_spawn", "PlayerSpawn"):
-                if layer_name in self.tile_map.sprite_lists:
-                    spawn_layer = self.tile_map.sprite_lists[layer_name]
+                if layer_name in data.tile_map.sprite_lists:
+                    spawn_layer = data.tile_map.sprite_lists[layer_name]
                     break
 
         if spawn_layer and len(spawn_layer) > 0:
@@ -110,5 +109,29 @@ class LevelLoader:
                 
                 data.rewindable_objects.append(rp)
                 data.moving_all_platform_sprites.append(spr)
+
+        # 5. Обычные двигающиеся платформы
+        if hasattr(data.tile_map, "sprite_lists"):
+            mp_layer = None
+            for name in ("MovingPlatform", "moving_platform", "MovingPlatforms"):
+                if name in data.tile_map.sprite_lists:
+                    mp_layer = data.tile_map.sprite_lists[name]
+                    break
+
+            if mp_layer:
+                for spr in mp_layer:
+                    props = getattr(spr, "properties", {}) or {}
+                    vx = float(props.get("change_x", props.get("vx", 0)))
+                    vy = float(props.get("change_y", props.get("vy", 0)))
+
+                    mp = MovingPlatform(spr, vx=vx, vy=vy)
+
+                    mp.boundary_left = float(props.get("boundary_left")) if props.get("boundary_left") is not None else None
+                    mp.boundary_right = float(props.get("boundary_right")) if props.get("boundary_right") is not None else None
+                    mp.boundary_top = float(props.get("boundary_top")) if props.get("boundary_top") is not None else None
+                    mp.boundary_bottom = float(props.get("boundary_bottom")) if props.get("boundary_bottom") is not None else None
+
+                    data.moving_platforms.append(mp)
+                    data.moving_all_platform_sprites.append(spr)
 
         return data

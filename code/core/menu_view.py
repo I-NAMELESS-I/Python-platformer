@@ -25,7 +25,6 @@ class MenuView(arcade.View):
         self.ui = ButtonGroup()
         self._layout_dirty = True
 
-        # Если карт нет — создаём заглушку, чтобы не падать
         if not self.level_paths:
             self.level_paths.append(MAPS_DIR / "test_map.tmx")
 
@@ -76,7 +75,6 @@ class MenuView(arcade.View):
         self.ui.draw()
 
     def on_key_press(self, key, modifiers):
-        # Главное меню управляется только мышью
         return
 
     def on_mouse_motion(self, x, y, dx, dy):

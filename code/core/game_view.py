@@ -1,12 +1,15 @@
+from pathlib import Path
+
 import arcade
 
-from code.entities.player import Player
 from code.core.input_manager import InputManager
+from code.level.level_loader import LevelLoader
 from code.settings import MAPS_DIR
+from code.core.pause_view import PauseView
 
 
 class GameView(arcade.View):
-    def __init__(self):
+    def __init__(self, map_path: Path | str | None = None):
         super().__init__()
 
         # Камера для мира и для UI
@@ -14,57 +17,43 @@ class GameView(arcade.View):
         self.gui_camera = arcade.Camera2D()
         self.camera.zoom = 2
 
-        # Загружаем карту уровня
-        map_path = MAPS_DIR / "test_map.tmx"
-        self.tile_map = arcade.load_tilemap(str(map_path))
+        # Выбранный уровень
+        self.map_path = Path(map_path) if map_path else MAPS_DIR / "test_map.tmx"
 
-        # Позиция спавна игрока из слоя карты
-        spawn_x, spawn_y = 0, 0
-        spawn_layer = None
+        # Загружаем данные уровня через загрузчик
+        self.level_loader = LevelLoader(self.map_path)
+        self.level_data = self.level_loader.load()
 
-        # Игрок
-        self.player = LevelLoader.data.player
+        self.tile_map = self.level_data.tile_map
+        self.player = self.level_data.player
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player)
 
-        # Список объектов, которые можно перематывать
-        # self.rewindable_objects = []  # логика
-        # self.rewindable_objects_sprites = arcade.SpriteList()  # спрайты
-
-        # Статичные платформы (берём слой collision из тайл-карты)
-        self.static_platforms = arcade.SpriteList()
-        if hasattr(self.tile_map, "sprite_lists"):
-            for layer_name in ("collision", "Collision", "Collisions"):
-                if layer_name in self.tile_map.sprite_lists:
-                    self.static_platforms = self.tile_map.sprite_lists[layer_name]
-                    break
-
-        # Двигающиеся платформы
-        self.moving_platforms = []
-        self.moving_platform_sprites = arcade.SpriteList()
+        # Платформы
+        self.static_platforms = self.level_data.static_platforms
+        self.moving_platforms = self.level_data.moving_platforms
+        self.rewindable_objects = self.level_data.rewindable_objects
+        self.moving_platform_sprites = self.level_data.moving_all_platform_sprites
 
         # Управление
         self.input_manager = InputManager(self.player)
-        # self.input_manager = InputManager(self.player, self.time_system,
-        #                                   self.rewindable_objects)
 
         # Дополнительные слои карты
-        if hasattr(self.tile_map, "sprite_lists") and "DeathZones" in self.tile_map.sprite_lists:
-            self.death_zones = self.tile_map.sprite_lists["DeathZones"]
-        else:
-            self.death_zones = arcade.SpriteList()
+        self.death_zones = self.level_data.death_zones or arcade.SpriteList()
 
         # Физика
         platforms = arcade.SpriteList()
         platforms.extend(self.static_platforms)
         platforms.extend(self.moving_platform_sprites)
-        # platforms.extend(self.rewindable_objects_sprites)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player,
             platforms=platforms,
             gravity_constant=0.5
         )
+
+        # Центрируем камеру на старте
+        self.camera.position = (self.player.center_x, self.player.center_y)
 
     # ОТРИСОВКА
     def on_draw(self):
@@ -74,7 +63,10 @@ class GameView(arcade.View):
 
         # Рисуем карту и объекты
         if self.tile_map and hasattr(self.tile_map, "sprite_lists"):
-            for sprite_list in self.tile_map.sprite_lists.values():
+            for name, sprite_list in self.tile_map.sprite_lists.items():
+                # Двигающиеся платформы рисуем отдельно, чтобы не дублировать
+                if name in ("MovingPlatform", "moving_platform", "MovingPlatforms", "RewindablePlatforms"):
+                    continue
                 sprite_list.draw()
 
         # Двигающиеся платформы и игрок (не входят в sprite_lists карты)
@@ -105,8 +97,14 @@ class GameView(arcade.View):
         for platform in self.moving_platforms:
             platform.update(delta_time)
 
+        for platform in self.rewindable_objects:
+            platform.update(delta_time)
+
     # INPUT
     def on_key_press(self, key, modifiers):
+        if key == arcade.key.ESCAPE:
+            self.window.show_view(PauseView(self))
+            return
         self.input_manager.on_key_press(key, modifiers)
 
     def on_key_release(self, key, modifiers):

@@ -1,20 +1,21 @@
 import arcade
-from code.core.game_view import GameView
+from code.core.menu_view import MenuView
+from code.core.app_config import AppConfig, apply_window_config
 from code.settings import SCREEN_TITLE
 
 def main():
-    # Размер монитора
-    screen_width, screen_height = arcade.get_display_size()
-    
-    window = arcade.Window(
-        width=screen_width,
-        height=screen_height,
-        title=SCREEN_TITLE,
-        fullscreen=True
-    )
+    try:
+        from arcade.texture import Texture, TextureFilter  # type: ignore
+        Texture.default_filter = TextureFilter.NEAREST
+    except Exception:
+        pass
 
-    game_view = GameView()
-    window.show_view(game_view)
+    cfg = AppConfig.load()
+    window = arcade.Window(width=cfg.width, height=cfg.height, title=SCREEN_TITLE, fullscreen=False)
+    apply_window_config(window, cfg)
+
+    menu_view = MenuView()
+    window.show_view(menu_view)
 
     arcade.run()
 
