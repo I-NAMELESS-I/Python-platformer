@@ -13,45 +13,46 @@ class TimeSystem:
 
     def toggle_time_stop(self) -> None:
         self.time_stopped = not self.time_stopped
-        for obj in self.rewindable_objects:
-            # ожидается метод set_paused у объектов
-            if hasattr(obj, "set_paused"):
-                obj.set_paused(self.time_stopped)
+        if self.time_stopped:
+            for obj in self.rewindable_objects:
+                # ожидается метод set_paused у объектов
+                if obj.is_selected:
+                    obj.stop_rewind()
+                    obj.start_pause()
+                else:
+                    obj.stop_pause()
+        else: 
+            for obj in self.rewindable_objects: 
+                obj.stop_pause()
 
     def start_rewind(self) -> None:
-        if self.rewinding:
-            return
-        self.rewinding = True
-        # при старте перемотки выключаем стоп времени
-        self.time_stopped = False
-        for obj in self.rewindable_objects:
-            if hasattr(obj, "set_rewinding"):
-                obj.set_rewinding(True)
-
-    def stop_rewind(self) -> None:
+        # Если сейчас выключено и мы пытаемся включить — проверяем, есть ли выбранный объект
         if not self.rewinding:
-            return
-        self.rewinding = False
-        for obj in self.rewindable_objects:
-            if hasattr(obj, "set_rewinding"):
-                obj.set_rewinding(False)
+            selected_exists = any(getattr(o, "is_selected", False) for o in self.rewindable_objects)
+            if not selected_exists:
+                # Нечего перематывать — игнорируем нажатие
+                return
 
-    def select_object(self, obj: object) -> None:
-        self.selected_object = obj
+        # Toggle флаг
+        self.rewinding = not self.rewinding
 
-    def clear_selection(self) -> None:
-        self.selected_object = None
+        if self.rewinding:
+            for obj in self.rewindable_objects:
+                if getattr(obj, "is_selected", False):
+                    obj.stop_pause()
+                    obj.start_rewind()
+                else:
+                    obj.stop_rewind()
+        else:
+            for obj in self.rewindable_objects:
+                obj.stop_rewind()
+
+        
+        print("Rewind toggled:", self.rewinding, "selected objects:", [getattr(o,'is_selected',False) for o in self.rewindable_objects])
 
     def update(self, delta_time: float) -> None:
-        """
-        Обновляет rewindable объекты.
-        - Если время остановлено и не перематывается — объекты не обновляются.
-        - Если перемотка — объекты сами берут из истории.
-        - В обычном режиме — объекты обновляются и записывают историю.
-        """
         if self.time_stopped and not self.rewinding:
             return
 
         for obj in self.rewindable_objects:
-            # объекты должны реализовать update(delta_time)
             obj.update(delta_time)

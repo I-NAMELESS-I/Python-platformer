@@ -67,17 +67,18 @@ class InputManager:
         if not self.check("select_object", button):
             return
 
-        # Если система времени/объекты не настроены — просто выходим
         if self.time_system is None or not self.rewindable_platforms:
             return
 
-        for obj in self.rewindable_platforms:
-            if obj.sprite and obj.sprite.collides_with_point((x, y)):
-                self.time_system.select_object(obj)
-                return
+        for obj in self.rewindable_platforms: 
+            obj.is_selected = False 
 
-        # Очистка выбора объекта
-        self.time_system.clear_selection()
+        for obj in self.rewindable_platforms: 
+            if obj.sprite and obj.sprite.collides_with_point((x, y)): 
+                obj.is_selected = True 
+                break
+        
+        print("Selected:", [(obj.sprite.center_x, obj.sprite.center_y, obj.is_selected) for obj in self.rewindable_platforms])
 
     # UPDATE
     def update(self, delta_time):

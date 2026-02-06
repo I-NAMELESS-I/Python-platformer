@@ -16,9 +16,6 @@ class MovingPlatform:
         self.vx = vx
         self.vy = vy
 
-        self.original_vx = vx
-        self.original_vy = vy
-
         # Границы движения, если заданы в свойствах карты
         self.boundary_left = boundary_left
         self.boundary_right = boundary_right
