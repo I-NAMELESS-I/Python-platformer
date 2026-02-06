@@ -2,6 +2,8 @@ from pathlib import Path
 
 import arcade
 
+from code.time_system.time_system import TimeSystem
+
 from code.core.input_manager import InputManager
 from code.level.level_loader import LevelLoader
 from code.settings import MAPS_DIR
@@ -32,11 +34,14 @@ class GameView(arcade.View):
         # Платформы
         self.static_platforms = self.level_data.static_platforms
         self.moving_platforms = self.level_data.moving_platforms
-        self.rewindable_objects = self.level_data.rewindable_objects
+        self.rewindable_platforms = self.level_data.rewindable_platforms
         self.moving_platform_sprites = self.level_data.moving_all_platform_sprites
 
-        # Управление
-        self.input_manager = InputManager(self.player)
+        # после self.rewindable_platforms = self.level_data.rewindable_platforms
+        self.time_system = TimeSystem(self.rewindable_platforms)
+
+        # перед созданием InputManager передаём time_system и список rewindable объектов
+        self.input_manager = InputManager(self.player, time_system=self.time_system, rewindable_platforms=self.rewindable_platforms)
 
         # Дополнительные слои карты
         self.death_zones = self.level_data.death_zones or arcade.SpriteList()
@@ -78,6 +83,7 @@ class GameView(arcade.View):
     # ОБНОВЛЕНИЕ ЛОГИКИ
     def on_update(self, delta_time):
         self.input_manager.update(delta_time)
+        self.time_system.update(delta_time)
         self.physics_engine.update()
 
         # Камера следует за игроком с плавным смещением
@@ -97,8 +103,6 @@ class GameView(arcade.View):
         for platform in self.moving_platforms:
             platform.update(delta_time)
 
-        for platform in self.rewindable_objects:
-            platform.update(delta_time)
 
     # INPUT
     def on_key_press(self, key, modifiers):

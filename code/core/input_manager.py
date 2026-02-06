@@ -3,10 +3,10 @@ from code.settings import KEYBINDS
 
 
 class InputManager:
-    def __init__(self, player, time_system=None, rewindable_objects=None):
+    def __init__(self, player, time_system=None, rewindable_platforms=None):
         self.player = player
         self.time_system = time_system
-        self.rewindable_objects = rewindable_objects
+        self.rewindable_platforms = rewindable_platforms
 
         self.keybinds = KEYBINDS.copy()
 
@@ -68,10 +68,10 @@ class InputManager:
             return
 
         # Если система времени/объекты не настроены — просто выходим
-        if self.time_system is None or not self.rewindable_objects:
+        if self.time_system is None or not self.rewindable_platforms:
             return
 
-        for obj in self.rewindable_objects:
+        for obj in self.rewindable_platforms:
             if obj.sprite and obj.sprite.collides_with_point((x, y)):
                 self.time_system.select_object(obj)
                 return
@@ -98,3 +98,4 @@ class InputManager:
         # Может совершаться только если игрок на земле
         if self.keys["jump"]:
             self.player.jump()
+            

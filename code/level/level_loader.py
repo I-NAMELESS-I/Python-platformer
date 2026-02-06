@@ -20,7 +20,7 @@ class LevelData:
 
         # Объекты с логикой
         self.moving_platforms: List[MovingPlatform] = []
-        self.rewindable_objects: List[RewindablePlatform] = []
+        self.rewindable_platforms: List[RewindablePlatform] = []
 
 
 class LevelLoader:
@@ -78,60 +78,86 @@ class LevelLoader:
 
         data.player = Player(spawn_x, spawn_y)
 
-        # 4. Moving platforms (пока только которые можно перемотать)
+        # 4. platforms
         if hasattr(data.tile_map, "sprite_lists") and "RewindablePlatforms" in data.tile_map.sprite_lists:
             mp_list = data.tile_map.sprite_lists["RewindablePlatforms"]
             for spr in mp_list:
+                # внутри цикла по платформам в LevelLoader
                 props = getattr(spr, "properties", {}) or {}
 
-                # читаем скорости (поддерживаем разные имена)
+                # скорости
                 vx = float(props.get("change_x", props.get("vx", 0)))
                 vy = float(props.get("change_y", props.get("vy", 0)))
 
-                # создаём объект-обёртку
-                rp = RewindablePlatform(spr, vx=vx, vy=vy)
-
-                # читаем границы, если заданы
-                left = props.get("boundary_left")
-                right = props.get("boundary_right")
-                top = props.get("boundary_top")
-                bottom = props.get("boundary_bottom")
-
-                rp.boundary_left = float(left) if left is not None else None
-                rp.boundary_right = float(right) if right is not None else None
-                rp.boundary_top = float(top) if top is not None else None
-                rp.boundary_bottom = float(bottom) if bottom is not None else None
+                # границы
+                left   = self._parse_float(props.get("boundary_left"))
+                right  = self._parse_float(props.get("boundary_right"))
+                top    = self._parse_float(props.get("boundary_top"))
+                bottom = self._parse_float(props.get("boundary_bottom"))
 
                 # rewindable флаг
-                rewindable_flag = props.get("rewindable", False)
-                if isinstance(rewindable_flag, str):
-                    rewindable_flag = rewindable_flag.lower() in ("1", "true", "yes")
-                
-                data.rewindable_objects.append(rp)
+                rewindable_flag = self._parse_bool(props.get("rewindable"))
+
+                # freeze флаг (поддерживаем разные варианты)
+                freeze_flag = self._parse_bool(
+                    props.get("freeze") or
+                    props.get("frozen") or
+                    props.get("start_frozen") or
+                    props.get("paused") or
+                    props.get("pause")
+                )
+
+                # создаём объект
+                if rewindable_flag:
+                    obj = RewindablePlatform(
+                        spr,
+                        vx=vx, vy=vy,
+                        boundary_left=left,
+                        boundary_right=right,
+                        boundary_top=top,
+                        boundary_bottom=bottom
+                    )
+                    data.rewindable_objects.append(obj)
+                else:
+                    obj = MovingPlatform(
+                        spr,
+                        vx=vx, vy=vy,
+                        boundary_left=left,
+                        boundary_right=right,
+                        boundary_top=top,
+                        boundary_bottom=bottom
+                    )
+                    data.moving_platforms.append(obj)
+
+                # общий список спрайтов
                 data.moving_all_platform_sprites.append(spr)
 
-        # 5. Обычные двигающиеся платформы
-        if hasattr(data.tile_map, "sprite_lists"):
-            mp_layer = None
-            for name in ("MovingPlatform", "moving_platform", "MovingPlatforms"):
-                if name in data.tile_map.sprite_lists:
-                    mp_layer = data.tile_map.sprite_lists[name]
-                    break
-
-            if mp_layer:
-                for spr in mp_layer:
-                    props = getattr(spr, "properties", {}) or {}
-                    vx = float(props.get("change_x", props.get("vx", 0)))
-                    vy = float(props.get("change_y", props.get("vy", 0)))
-
-                    mp = MovingPlatform(spr, vx=vx, vy=vy)
-
-                    mp.boundary_left = float(props.get("boundary_left")) if props.get("boundary_left") is not None else None
-                    mp.boundary_right = float(props.get("boundary_right")) if props.get("boundary_right") is not None else None
-                    mp.boundary_top = float(props.get("boundary_top")) if props.get("boundary_top") is not None else None
-                    mp.boundary_bottom = float(props.get("boundary_bottom")) if props.get("boundary_bottom") is not None else None
-
-                    data.moving_platforms.append(mp)
-                    data.moving_all_platform_sprites.append(spr)
+                # применяем freeze, если указан
+                if freeze_flag and hasattr(obj, "set_paused"):
+                    obj.set_paused(True)
 
         return data
+
+    def _parse_bool(self, value):
+        if isinstance(value, bool):
+            return value
+
+        if value is None:
+            return False
+
+        # Числа
+        if isinstance(value, (int, float)):
+            return value != 0
+
+        # Строки
+        s = str(value).strip().lower()
+        return s in ("1", "true", "yes", "y", "on")
+    
+    def _parse_float(self, value):
+        if value is None:
+            return None
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return None
+
