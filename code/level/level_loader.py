@@ -79,10 +79,20 @@ class LevelLoader:
         data.player = Player(spawn_x, spawn_y)
 
         # 4. platforms
-        if hasattr(data.tile_map, "sprite_lists") and "RewindablePlatforms" in data.tile_map.sprite_lists:
-            mp_list = data.tile_map.sprite_lists["RewindablePlatforms"]
-            for spr in mp_list:
-                # внутри цикла по платформам в LevelLoader
+        moving_layers = []
+
+        # Явный слой для rewindable
+        if "RewindablePlatforms" in data.tile_map.sprite_lists:
+            moving_layers.append(("RewindablePlatforms", data.tile_map.sprite_lists["RewindablePlatforms"]))
+
+        # Обычные движущиеся платформы
+        for name in ("MovingPlatform", "moving_platform", "MovingPlatforms"):
+            if name in data.tile_map.sprite_lists:
+                moving_layers.append((name, data.tile_map.sprite_lists[name]))
+
+        # Обрабатываем все найденные слои
+        for layer_name, sprite_list in moving_layers:
+            for spr in sprite_list:
                 props = getattr(spr, "properties", {}) or {}
 
                 # скорости
@@ -90,22 +100,15 @@ class LevelLoader:
                 vy = float(props.get("change_y", props.get("vy", 0)))
 
                 # границы
-                left   = self._parse_float(props.get("boundary_left"))
-                right  = self._parse_float(props.get("boundary_right"))
-                top    = self._parse_float(props.get("boundary_top"))
+                left = self._parse_float(props.get("boundary_left"))
+                right = self._parse_float(props.get("boundary_right"))
+                top = self._parse_float(props.get("boundary_top"))
                 bottom = self._parse_float(props.get("boundary_bottom"))
 
-                # rewindable флаг
+                # rewindable?
                 rewindable_flag = self._parse_bool(props.get("rewindable"))
-
-                # freeze флаг (поддерживаем разные варианты)
-                freeze_flag = self._parse_bool(
-                    props.get("freeze") or
-                    props.get("frozen") or
-                    props.get("start_frozen") or
-                    props.get("paused") or
-                    props.get("pause")
-                )
+                if layer_name == "RewindablePlatforms":
+                    rewindable_flag = True
 
                 # создаём объект
                 if rewindable_flag:
@@ -117,7 +120,7 @@ class LevelLoader:
                         boundary_top=top,
                         boundary_bottom=bottom
                     )
-                    data.rewindable_objects.append(obj)
+                    data.rewindable_platforms.append(obj)
                 else:
                     obj = MovingPlatform(
                         spr,
@@ -131,10 +134,6 @@ class LevelLoader:
 
                 # общий список спрайтов
                 data.moving_all_platform_sprites.append(spr)
-
-                # применяем freeze, если указан
-                if freeze_flag and hasattr(obj, "set_paused"):
-                    obj.set_paused(True)
 
         return data
 
