@@ -6,6 +6,7 @@ from code.core.game_view import GameView
 from code.core.level_select_view import LevelSelectView
 from code.core.app_config import AppConfig
 from code.core.settings_view import SettingsView
+from code.core.rules_view import RulesView
 from code.core.ui_widgets import Button, ButtonGroup
 from code.settings import MAPS_DIR, SCREEN_TITLE
 
@@ -49,13 +50,18 @@ class MenuView(arcade.View):
         def open_settings():
             self.window.show_view(SettingsView(back_view=self))
 
+        def open_rules():
+            self.window.show_view(RulesView(back_view=self))
+
         def quit_game():
             arcade.exit()
 
-        self.ui.add(Button("Играть", width / 2, base_y + (button_h + gap) * 3, button_w, button_h, start_last))
-        self.ui.add(Button("Выбор уровня", width / 2, base_y + (button_h + gap) * 2, button_w, button_h, level_select))
+        self.ui.add(Button("Играть", width / 2, base_y + (button_h + gap) * 4, button_w, button_h, start_last))
+        self.ui.add(Button("Выбор уровня", width / 2, base_y + (button_h + gap) * 3, button_w, button_h, level_select))
+        self.ui.add(Button("Правила", width / 2, base_y + (button_h + gap) * 2, button_w, button_h, open_rules))
         self.ui.add(Button("Настройки", width / 2, base_y + (button_h + gap) * 1, button_w, button_h, open_settings))
         self.ui.add(Button("Выход", width / 2, base_y + (button_h + gap) * 0, button_w, button_h, quit_game))
+
 
     def on_draw(self):
         self._ensure_layout()
