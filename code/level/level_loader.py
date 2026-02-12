@@ -37,8 +37,9 @@ class LevelLoader:
       - boundary_left, boundary_right, boundary_top, boundary_bottom  (границы движения)
       - rewindable  (boolean)
     """
-    def __init__(self, map_path: Path):
+    def __init__(self, map_path: Path, on_player_death=None):
         self.map_path = map_path
+        self.on_player_death = on_player_death
 
     def load(self) -> LevelData:
         data = LevelData()
@@ -76,7 +77,7 @@ class LevelLoader:
             # Если слой спавна не найден, используем запасную позицию
             spawn_x, spawn_y = 300, 300
 
-        data.player = Player(spawn_x, spawn_y)
+        data.player = Player(spawn_x, spawn_y, on_death_complete=self.on_player_death)
 
         # 4. platforms
         moving_layers = []

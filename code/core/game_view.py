@@ -21,13 +21,16 @@ class GameView(arcade.View):
         self.map_path = Path(map_path) if map_path else MAPS_DIR / "test_map.tmx"
 
         # Загружаем данные уровня через загрузчик
-        self.level_loader = LevelLoader(self.map_path)
+        self.level_loader = LevelLoader(self.map_path, on_player_death=self.handle_player_death)
         self.level_data = self.level_loader.load()
 
         self.tile_map = self.level_data.tile_map
         self.player = self.level_data.player
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player)
+
+        # Флаг для смерти
+        self.game_over = False
 
         # Платформы
         self.static_platforms = self.level_data.static_platforms
@@ -54,6 +57,13 @@ class GameView(arcade.View):
 
         # Центрируем камеру на старте
         self.camera.position = (self.player.center_x, self.player.center_y)
+
+    def handle_player_death(self, player):
+        if getattr(self, "game_over", False):
+            return
+        self.game_over = True
+        from code.core.game_over_view import GameOverView
+        self.window.show_view(GameOverView(self))
 
     # ОТРИСОВКА
     def on_draw(self):
