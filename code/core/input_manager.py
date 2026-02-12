@@ -3,10 +3,9 @@ from code.settings import KEYBINDS
 
 
 class InputManager:
-    def __init__(self, player, time_system=None, rewindable_platforms=None):
+    def __init__(self, player, rewindable_objects=None):
         self.player = player
-        self.time_system = time_system
-        self.rewindable_platforms = rewindable_platforms
+        self.rewindable_objects = rewindable_objects
 
         self.keybinds = KEYBINDS.copy()
 
@@ -16,7 +15,6 @@ class InputManager:
             "right": False,
             "jump": False,
             "fast_fall": False,
-            "select_object": False
         }
 
     # Вспомогательная функция для того, чтобы определить нажата ли та кнопка
@@ -41,11 +39,13 @@ class InputManager:
         if self.check("fast_fall", key):
             self.keys["fast_fall"] = True
 
-        if self.check("time_stop", key) and self.time_system is not None:
-            self.time_system.toggle_time_stop()
+        if self.check("time_stop", key):
+            for pl in self.rewindable_objects:
+                pl.start_pause()
 
-        if self.check("rewind", key) and self.time_system is not None:
-            self.time_system.start_rewind()
+        if self.check("rewind", key):
+            for pl in self.rewindable_objects:
+                pl.start_rewind()
 
     # KEY RELEASE
     def on_key_release(self, key, modifiers):
@@ -62,23 +62,17 @@ class InputManager:
         if self.check("fast_fall", key):
             self.keys["fast_fall"] = False
 
+        if self.check("time_stop", key):
+            for pl in self.rewindable_objects:
+                pl.stop_pause()
+
+        if self.check("rewind", key):
+            for pl in self.rewindable_objects:
+                pl.stop_rewind()
+
     # MOUSE PRESS — выбор объекта
     def on_mouse_press(self, x, y, button, modifiers):
-        if not self.check("select_object", button):
-            return
-
-        if self.time_system is None or not self.rewindable_platforms:
-            return
-
-        for obj in self.rewindable_platforms: 
-            obj.is_selected = False 
-
-        for obj in self.rewindable_platforms: 
-            if obj.sprite and obj.sprite.collides_with_point((x, y)): 
-                obj.is_selected = True 
-                break
-        
-        print("Selected:", [(obj.sprite.center_x, obj.sprite.center_y, obj.is_selected) for obj in self.rewindable_platforms])
+        pass
 
     # UPDATE
     def update(self, delta_time):
@@ -98,5 +92,4 @@ class InputManager:
 
         # Может совершаться только если игрок на земле
         if self.keys["jump"]:
-            self.player.jump()
-            
+            self.player.jump()         

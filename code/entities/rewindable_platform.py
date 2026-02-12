@@ -14,15 +14,11 @@ class RewindablePlatform:
         self.sprite = sprite
         self.vx = vx
         self.vy = vy
-
-        # Сохраняем "исходную" скорость, чтобы при rewind инвертировать её
-        self.original_vx = vx
-        self.original_vy = vy
+        self.o_x = vx
+        self.o_y = vy
 
         self.paused = False
         self.rewinding = False
-
-        self.is_selected = False
 
         # Границы движения, если заданы в свойствах карты
         self.boundary_left = boundary_left
@@ -30,23 +26,17 @@ class RewindablePlatform:
         self.boundary_top = boundary_top
         self.boundary_bottom = boundary_bottom
 
-        self.sprite.update = lambda: None
-
     def start_pause(self):
-        if not self.paused:
-            self.paused = True
+        self.paused = True
     
     def stop_pause(self):
-        if self.paused:
-            self.paused = False
+        self.paused = False
 
     def start_rewind(self):
-        if not self.rewinding:
-            self.rewinding = True
+        self.rewinding = True
     
     def stop_rewind(self):
-        if self.rewinding:
-            self.rewinding = False
+        self.rewinding = False
 
     def update(self, delta_time: float):
         if self.paused:

@@ -33,7 +33,7 @@ class LevelLoader:
       - Spawn или PlayerSpawn  (точка спавна игрока)
       - DeathZones  (зоны смерти / шипы)
     Ожидаемые свойства объекта платформы:
-      - change_x, change_y  (скорость в пикселях в секунду)
+      - cl_x, cl_y  (скорость в пикселях в секунду)
       - boundary_left, boundary_right, boundary_top, boundary_bottom  (границы движения)
       - rewindable  (boolean)
     """
@@ -86,7 +86,7 @@ class LevelLoader:
             moving_layers.append(("RewindablePlatforms", data.tile_map.sprite_lists["RewindablePlatforms"]))
 
         # Обычные движущиеся платформы
-        for name in ("MovingPlatform", "moving_platform", "MovingPlatforms"):
+        for name in ("MovingPlatform",):
             if name in data.tile_map.sprite_lists:
                 moving_layers.append((name, data.tile_map.sprite_lists[name]))
 
@@ -96,8 +96,8 @@ class LevelLoader:
                 props = getattr(spr, "properties", {}) or {}
 
                 # скорости
-                vx = float(props.get("change_x", props.get("vx", 0)))
-                vy = float(props.get("change_y", props.get("vy", 0)))
+                vx = float(props.get("cl_x", props.get("vx", 0)))
+                vy = float(props.get("cl_y", props.get("vy", 0)))
 
                 # границы
                 left = self._parse_float(props.get("boundary_left"))

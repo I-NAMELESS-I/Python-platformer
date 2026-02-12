@@ -204,7 +204,7 @@
    <properties>
     <property name="boundary_left" type="float" value="250"/>
     <property name="boundary_right" type="float" value="400"/>
-    <property name="change_x" type="float" value="0.5"/>
+    <property name="cl_x" type="float" value="0.5"/>
    </properties>
   </object>
  </objectgroup>
