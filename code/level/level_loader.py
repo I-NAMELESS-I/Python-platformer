@@ -17,6 +17,7 @@ class LevelData:
         self.static_platforms: arcade.SpriteList = arcade.SpriteList()
         self.moving_all_platform_sprites: arcade.SpriteList = arcade.SpriteList()
         self.death_zones: arcade.SpriteList = arcade.SpriteList()
+        self.finish: arcade.SpriteList = arcade.SpriteList()
 
         # Объекты с логикой
         self.moving_platforms: List[MovingPlatform] = []
@@ -57,6 +58,10 @@ class LevelLoader:
         # 2. Death zones / spikes
         if hasattr(data.tile_map, "sprite_lists") and "DeathZones" in data.tile_map.sprite_lists:
             data.death_zones = data.tile_map.sprite_lists["DeathZones"]
+
+        # 2.1. Finish
+        if hasattr(data.tile_map, "sprite_lists") and "finish" in data.tile_map.sprite_lists:
+            data.finish = data.tile_map.sprite_lists["finish"]
 
         # 3. Player spawn
         # Позиция спавна игрока из слоя карты

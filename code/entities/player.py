@@ -11,7 +11,7 @@ class Player(arcade.Sprite):
         self.center_y = y
 
         # Параметры движения
-        self.move_speed = 5
+        self.move_speed = 4
         self.jump_speed = 8
         self.fast_fall_speed = -12
         self.on_ground = False

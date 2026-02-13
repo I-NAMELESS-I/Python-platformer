@@ -43,6 +43,7 @@ class GameView(arcade.View):
 
         # Дополнительные слои карты
         self.death_zones = self.level_data.death_zones or arcade.SpriteList()
+        self.finish_zones = self.level_data.finish
 
         # Физика
         platforms = arcade.SpriteList()
@@ -110,6 +111,15 @@ class GameView(arcade.View):
 
         if arcade.check_for_collision_with_list(self.player, self.death_zones):
             self.player.kill()
+
+        # Проверка финиша
+        if arcade.check_for_collision_with_list(self.player, self.finish_zones):
+            self.level_complete()
+            return
+
+    def level_complete(self):
+        from code.core.level_complete_view import LevelCompleteView
+        self.window.show_view(LevelCompleteView(self))
 
     # INPUT
     def on_key_press(self, key, modifiers):
