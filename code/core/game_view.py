@@ -53,7 +53,7 @@ class GameView(arcade.View):
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player,
             platforms=platforms,
-            gravity_constant=0.3
+            gravity_constant=0.4
         )
 
         # Центрируем камеру на старте
@@ -86,19 +86,42 @@ class GameView(arcade.View):
 
         self.gui_camera.use()
 
+    def get_platform_under_player(self):
+        epsilon = 6  # допустимый вертикальный допуск (пиксели)
+        for rp in self.moving_platforms + self.rewindable_platforms:
+            spr = rp.sprite
+            # проверяем, что игрок стоит сверху
+            if (
+                    0 <= (self.player.bottom - spr.top) <= epsilon and
+                    self.player.right > spr.left + 2 and
+                    self.player.left < spr.right - 2 and
+                    self.player.change_y <= 0  # игрок не прыгает вверх
+            ):
+                return rp
+        return None
+
     # ОБНОВЛЕНИЕ ЛОГИКИ
     def on_update(self, delta_time):
+        # Обработка ввода
         self.input_manager.update(delta_time)
 
+        # Обновляем все платформы (moving и rewindable)
         for platform in self.moving_platforms:
             platform.update(delta_time)
+        for platform in self.rewindable_platforms:
+            platform.update(delta_time)
 
-        for obj in self.rewindable_platforms:
-            obj.update(delta_time)
+        # Если игрок стоит на платформе — переносим его на фактическое смещение платформы
+        platform = self.get_platform_under_player()
+        if platform:
+            # platform.last_dx/last_dy уже вычислены в update()
+            self.player.center_x += platform.last_dx
+            self.player.center_y += platform.last_dy
 
+        # Обновляем физику после перемещения платформ — так физика видит корректную позицию игрока
         self.physics_engine.update()
 
-        # Камера следует за игроком с плавным смещением
+        # Камера, анимация, проверки
         target_x, target_y = self.player.center_x, self.player.center_y
         current_x, current_y = self.camera.position
         lerp_speed = 0.1
@@ -112,7 +135,6 @@ class GameView(arcade.View):
         if arcade.check_for_collision_with_list(self.player, self.death_zones):
             self.player.kill()
 
-        # Проверка финиша
         if arcade.check_for_collision_with_list(self.player, self.finish_zones):
             self.level_complete()
             return

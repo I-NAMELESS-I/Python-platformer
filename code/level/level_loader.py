@@ -33,10 +33,10 @@ class LevelLoader:
       - RewindablePlatforms (объекты которые можно перемотать)
       - Spawn или PlayerSpawn  (точка спавна игрока)
       - DeathZones  (зоны смерти / шипы)
+      - finish (финиш)
     Ожидаемые свойства объекта платформы:
       - cl_x, cl_y  (скорость в пикселях в секунду)
-      - boundary_left, boundary_right, boundary_top, boundary_bottom  (границы движения)
-      - rewindable  (boolean)
+      - dx, dy  (границы движения, как смещение от начала движения)
     """
     def __init__(self, map_path: Path, on_player_death=None):
         self.map_path = map_path
@@ -48,22 +48,22 @@ class LevelLoader:
         # Загружаем тайлкарту
         data.tile_map = arcade.load_tilemap(str(self.map_path))
 
-        # 1. Статичные платформы (Collision)
+        # Статичные платформы (Collision)
         if hasattr(data.tile_map, "sprite_lists"):
             for name in ("Collision", "collision", "Collisions"):
                 if name in data.tile_map.sprite_lists:
                     data.static_platforms = data.tile_map.sprite_lists[name]
                     break
 
-        # 2. Death zones / spikes
+        # Death zones / spikes
         if hasattr(data.tile_map, "sprite_lists") and "DeathZones" in data.tile_map.sprite_lists:
             data.death_zones = data.tile_map.sprite_lists["DeathZones"]
 
-        # 2.1. Finish
+        # Finish
         if hasattr(data.tile_map, "sprite_lists") and "finish" in data.tile_map.sprite_lists:
             data.finish = data.tile_map.sprite_lists["finish"]
 
-        # 3. Player spawn
+        # Player spawn
         # Позиция спавна игрока из слоя карты
         spawn_x, spawn_y = 0, 0
         spawn_layer = None
@@ -106,10 +106,8 @@ class LevelLoader:
                 vy = float(props.get("cl_y", props.get("vy", 0)))
 
                 # границы
-                left = self._parse_float(props.get("boundary_left"))
-                right = self._parse_float(props.get("boundary_right"))
-                top = self._parse_float(props.get("boundary_top"))
-                bottom = self._parse_float(props.get("boundary_bottom"))
+                dx = float(props.get("dx", props.get("dx", 0)))
+                dy = float(props.get("dy", props.get("dy", 0)))
 
                 # rewindable?
                 rewindable_flag = self._parse_bool(props.get("rewindable"))
@@ -121,20 +119,14 @@ class LevelLoader:
                     obj = RewindablePlatform(
                         spr,
                         vx=vx, vy=vy,
-                        boundary_left=left,
-                        boundary_right=right,
-                        boundary_top=top,
-                        boundary_bottom=bottom
+                        dx=dx, dy=dy
                     )
                     data.rewindable_platforms.append(obj)
                 else:
                     obj = MovingPlatform(
                         spr,
                         vx=vx, vy=vy,
-                        boundary_left=left,
-                        boundary_right=right,
-                        boundary_top=top,
-                        boundary_bottom=bottom
+                        dx=dx, dy=dy
                     )
                     data.moving_platforms.append(obj)
 

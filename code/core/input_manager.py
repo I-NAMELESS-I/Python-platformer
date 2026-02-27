@@ -70,7 +70,6 @@ class InputManager:
             for pl in self.rewindable_objects:
                 pl.stop_rewind()
 
-    # MOUSE PRESS — выбор объекта
     def on_mouse_press(self, x, y, button, modifiers):
         pass
 
