@@ -12,13 +12,6 @@ from code.settings import MAPS_DIR, SCREEN_TITLE
 
 
 class MenuView(arcade.View):
-    """
-    Главное меню:
-      - Играть: запускает последний открытый уровень
-      - Выбор уровня: открывает список уровней
-      - Настройки
-      - Выход
-    """
 
     def __init__(self):
         super().__init__()

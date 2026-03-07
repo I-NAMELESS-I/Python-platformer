@@ -2,6 +2,7 @@ import arcade
 
 from code.settings import SPRITES_DIR
 
+
 class Player(arcade.Sprite):
 
     def __init__(self, x, y, on_death_complete=None):
@@ -84,23 +85,19 @@ class Player(arcade.Sprite):
     def update_on_ground_state(self, physics_engine):
         self.on_ground = physics_engine.can_jump()
 
-    # kill запускет анимацию смерти
     def kill(self):
         if self.dead:
             return
         self.dead = True
         self._death_frame = 0.0
-        # Остановить движение
         self.change_x = 0
         self.change_y = 0
 
     def update_animation(self, dt):
-        # Если игрок мёртв — проигрываем анимацию смерти
         if self.dead:
             self._death_frame += self._death_speed
             idx = int(self._death_frame)
             if idx >= len(self.death_textures):
-                # анимация закончилась, оставляем последний кадр и вызываем callback
                 self.texture = self.death_textures[-1]
                 if callable(self.on_death_complete):
                     cb = self.on_death_complete

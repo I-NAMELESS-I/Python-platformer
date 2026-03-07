@@ -11,11 +11,6 @@ from code.settings import MAPS_DIR, SCREEN_TITLE
 
 
 class LevelSelectView(arcade.View):
-    """
-    Экран выбора уровня списком.
-    - ЛКМ по уровню: старт
-    - Назад: кнопка или ESC
-    """
 
     def __init__(self, back_view: arcade.View | None = None):
         super().__init__()
@@ -40,8 +35,7 @@ class LevelSelectView(arcade.View):
         gap = 10
         top_y = height * 0.62
 
-        # Кнопки уровней
-        for i, path in enumerate(self.level_paths[:10]):  # чтобы не улететь за экран
+        for i, path in enumerate(self.level_paths[:10]):
             y = top_y - i * (button_h + gap)
 
             def make_start(p: Path):
@@ -55,7 +49,6 @@ class LevelSelectView(arcade.View):
 
             self.ui.add(Button(path.stem, width / 2, y, button_w, button_h, make_start(path)))
 
-        # Назад
         def back():
             self.go_back()
 

@@ -8,12 +8,6 @@ from code.settings import SCREEN_TITLE
 
 
 class SettingsView(arcade.View):
-    """
-    Настройки окна:
-      - выбор разрешения
-      - режим окно / fullscreen
-    Управление мышью (кнопки), ESC — назад.
-    """
 
     RESOLUTIONS: list[tuple[int, int]] = [
         (1280, 720),

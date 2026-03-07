@@ -45,10 +45,8 @@ class GameOverView(arcade.View):
     def on_draw(self):
         self._ensure_layout()
 
-        # Сначала рисуем "замороженный" кадр игры
         self.game_view.on_draw()
-
-        # Затем — затемнение и текст
+        
         width, height = self.window.get_size()
         arcade.draw_lrbt_rectangle_filled(0, width, 0, height, (0, 0, 0, 180))
 

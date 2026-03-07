@@ -1,17 +1,14 @@
 import arcade
 from pathlib import Path
 
-# Базовая директория проекта (корень репозитория)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Директории ресурсов
 ASSETS_DIR = BASE_DIR / "assets"
 MAPS_DIR = ASSETS_DIR / "maps"
 SPRITES_DIR = ASSETS_DIR / "sprites"
 
 SCREEN_TITLE = "Time Control Platformer"
 
-# Пока None
 COOLDOWN_DURATION = None
 
 KEYBINDS = {

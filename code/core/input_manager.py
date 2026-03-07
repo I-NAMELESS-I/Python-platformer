@@ -47,7 +47,6 @@ class InputManager:
             for pl in self.rewindable_objects:
                 pl.start_rewind()
 
-    # KEY RELEASE
     def on_key_release(self, key, modifiers):
 
         if self.check("move_left", key):
@@ -73,7 +72,6 @@ class InputManager:
     def on_mouse_press(self, x, y, button, modifiers):
         pass
 
-    # UPDATE
     def update(self, delta_time):
 
         if self.keys["left"] and not self.keys["right"]:
@@ -85,10 +83,8 @@ class InputManager:
         else:
             self.player.stop_horizontal()
 
-        # Может совершаться только если игрок не на земле
         if self.keys["fast_fall"]:
             self.player.fast_fall()
 
-        # Может совершаться только если игрок на земле
         if self.keys["jump"]:
             self.player.jump()         

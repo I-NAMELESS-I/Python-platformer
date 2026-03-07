@@ -30,7 +30,6 @@ class AppConfig:
                 last_level=str(data.get("last_level", "")),
             )
         except Exception:
-            # Если файл битый — используем дефолт
             return cls()
 
     def save(self) -> None:
@@ -44,11 +43,6 @@ class AppConfig:
 
 
 def apply_window_config(window, cfg: AppConfig) -> None:
-    """
-    Применяет настройки окна.
-    В arcade порядок такой: сначала fullscreen, потом set_size (иначе некоторые драйверы/ОС игнорируют).
-    """
-    # set_fullscreen есть в arcade.Window
     window.set_fullscreen(cfg.fullscreen)
     if not cfg.fullscreen:
         window.set_size(cfg.width, cfg.height)

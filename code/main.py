@@ -5,7 +5,7 @@ from code.settings import SCREEN_TITLE
 
 def main():
     try:
-        from arcade.texture import Texture, TextureFilter  # type: ignore
+        from arcade.texture import Texture, TextureFilter
         Texture.default_filter = TextureFilter.NEAREST
     except Exception:
         pass

@@ -61,7 +61,6 @@ class RewindablePlatform:
         self.rewinding = False
 
     def update(self, delta_time: float):
-        # по умолчанию — нулевое смещение
         self.last_dx = 0.0
         self.last_dy = 0.0
 
@@ -80,7 +79,6 @@ class RewindablePlatform:
         new_x = old_x + intended_dx
         new_y = old_y + intended_dy
 
-        # корректируем по границам и при необходимости инвертируем скорость
         if self.boundary_left is not None and new_x < self.boundary_left:
             new_x = self.boundary_left
             self.vx = -self.vx
@@ -95,7 +93,6 @@ class RewindablePlatform:
             new_y = self.boundary_top
             self.vy = -self.vy
 
-        # применяем позицию и считаем фактическое смещение
         self.sprite.center_x = new_x
         self.sprite.center_y = new_y
 

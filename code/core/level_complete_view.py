@@ -5,7 +5,6 @@ class LevelCompleteView(GameOverView):
     def on_draw(self):
         self._ensure_layout()
 
-        # Рисуем замороженный кадр игры
         self.game_view.on_draw()
 
         width, height = self.window.get_size()

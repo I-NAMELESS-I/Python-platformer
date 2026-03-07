@@ -128,7 +128,6 @@ class RulesView(arcade.View):
         self.scroll_y -= scroll_y * self.scroll_speed
         # Ограничение в _ensure_layout/on_draw
 
-    # Клавиши вверх/вниз и Esc
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ESCAPE:
             if self.back_view:

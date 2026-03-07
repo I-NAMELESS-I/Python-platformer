@@ -12,15 +12,12 @@ class GameView(arcade.View):
     def __init__(self, map_path: Path | str | None = None):
         super().__init__()
 
-        # Камера для мира и для UI
         self.camera = arcade.Camera2D()
         self.gui_camera = arcade.Camera2D()
         self.camera.zoom = 2
 
-        # Выбранный уровень
         self.map_path = Path(map_path) if map_path else MAPS_DIR / "test_map.tmx"
 
-        # Загружаем данные уровня через загрузчик
         self.level_loader = LevelLoader(self.map_path, on_player_death=self.handle_player_death)
         self.level_data = self.level_loader.load()
 
@@ -29,23 +26,18 @@ class GameView(arcade.View):
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player)
 
-        # Флаг для смерти
         self.game_over = False
 
-        # Платформы
         self.static_platforms = self.level_data.static_platforms
         self.moving_platforms = self.level_data.moving_platforms
         self.rewindable_platforms = self.level_data.rewindable_platforms
         self.moving_platform_sprites = self.level_data.moving_all_platform_sprites
 
-        # перед созданием InputManager передаём time_system и список rewindable объектов
         self.input_manager = InputManager(self.player, rewindable_objects=self.rewindable_platforms)
 
-        # Дополнительные слои карты
         self.death_zones = self.level_data.death_zones or arcade.SpriteList()
         self.finish_zones = self.level_data.finish
 
-        # Физика
         platforms = arcade.SpriteList()
         platforms.extend(self.static_platforms)
         platforms.extend(self.moving_platform_sprites)
@@ -56,7 +48,6 @@ class GameView(arcade.View):
             gravity_constant=0.4
         )
 
-        # Центрируем камеру на старте
         self.camera.position = (self.player.center_x, self.player.center_y)
 
     def handle_player_death(self, player):
@@ -143,7 +134,6 @@ class GameView(arcade.View):
         from code.core.level_complete_view import LevelCompleteView
         self.window.show_view(LevelCompleteView(self))
 
-    # INPUT
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ESCAPE:
             self.window.show_view(PauseView(self))
@@ -154,6 +144,5 @@ class GameView(arcade.View):
         self.input_manager.on_key_release(key, modifiers)
 
     def on_mouse_press(self, x, y, button, modifiers):
-        # Переводим экранные координаты мыши в мировые с учётом камеры
         world_pos = self.camera.unproject((x, y))
         self.input_manager.on_mouse_press(world_pos[0], world_pos[1], button, modifiers)

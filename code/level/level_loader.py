@@ -96,25 +96,20 @@ class LevelLoader:
             if name in data.tile_map.sprite_lists:
                 moving_layers.append((name, data.tile_map.sprite_lists[name]))
 
-        # Обрабатываем все найденные слои
         for layer_name, sprite_list in moving_layers:
             for spr in sprite_list:
                 props = getattr(spr, "properties", {}) or {}
 
-                # скорости
                 vx = float(props.get("cl_x", props.get("vx", 0)))
                 vy = float(props.get("cl_y", props.get("vy", 0)))
 
-                # границы
                 dx = float(props.get("dx", props.get("dx", 0)))
                 dy = float(props.get("dy", props.get("dy", 0)))
 
-                # rewindable?
                 rewindable_flag = self._parse_bool(props.get("rewindable"))
                 if layer_name == "RewindablePlatforms":
                     rewindable_flag = True
 
-                # создаём объект
                 if rewindable_flag:
                     obj = RewindablePlatform(
                         spr,
@@ -130,7 +125,6 @@ class LevelLoader:
                     )
                     data.moving_platforms.append(obj)
 
-                # общий список спрайтов
                 data.moving_all_platform_sprites.append(spr)
 
         return data

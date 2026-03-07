@@ -1,7 +1,6 @@
 import arcade
 
 class MovingPlatform:
-    # Простая платформа с постоянной скоростью и границами (как вспомогательный объект который может пригодиться)
 
     def __init__(self, sprite: arcade.Sprite, vx: float = 0.0, vy: float = 0.0, dx: float = 0.0, dy: float = 0.0):
         self.sprite = sprite
